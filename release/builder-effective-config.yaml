@@ -1,0 +1,30 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.playbacker.desktop
+productName: Playbacker
+files:
+  - filter:
+      - dist/**/*
+      - build/**/*
+      - package.json
+asar: true
+win:
+  executableName: Playbacker
+  icon: build/icon.ico
+  signAndEditExecutable: false
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Playbacker
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  artifactName: Playbacker-${version}-Setup.${ext}
+electronVersion: 32.3.3
