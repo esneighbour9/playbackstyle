@@ -9,11 +9,18 @@ let mainWindow = null;
 let tray = null;
 let isQuitting = false;
 let mediaControl = null;
+// try {
+//   mediaControl = require('win-media-control');
+// } catch {
+//   console.warn('win-media-control not available, running in development mode');
+//   mediaControl = null;
+// }
 try {
     mediaControl = require('win-media-control');
+    console.log('win-media-control loaded successfully');
 }
-catch {
-    console.warn('win-media-control not available, running in development mode');
+catch (e) {
+    console.warn('win-media-control load failed:', e.message);
     mediaControl = null;
 }
 const createWindow = () => {

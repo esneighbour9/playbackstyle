@@ -14,10 +14,18 @@ let mediaControl: {
   togglePlayPause: () => Promise<any>;
 } | null = null;
 
+// try {
+//   mediaControl = require('win-media-control');
+// } catch {
+//   console.warn('win-media-control not available, running in development mode');
+//   mediaControl = null;
+// }
+
 try {
   mediaControl = require('win-media-control');
-} catch {
-  console.warn('win-media-control not available, running in development mode');
+  console.log('win-media-control loaded successfully');
+} catch (e: any) {
+  console.warn('win-media-control load failed:', e.message);
   mediaControl = null;
 }
 
