@@ -5,6 +5,50 @@ let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
 
+// let mediaControl: {
+//   listSessions: () => Promise<any[]>;
+//   play: () => Promise<any>;
+//   pause: () => Promise<any>;
+//   next: () => Promise<any>;
+//   previous: () => Promise<any>;
+//   togglePlayPause: () => Promise<any>;
+// } | null = null;
+
+// // try {
+// //   mediaControl = require('win-media-control');
+// // } catch {
+// //   console.warn('win-media-control not available, running in development mode');
+// //   mediaControl = null;
+// // }
+
+// try {
+//   mediaControl = require('win-media-control');
+//   console.log('win-media-control loaded successfully');
+// } catch (e: any) {
+//   console.warn('win-media-control load failed:', e.message);
+//   mediaControl = null;
+// }
+
+// let mediaControl: {
+//   listSessions: () => Promise<any[]>;
+//   play: () => Promise<any>;
+//   pause: () => Promise<any>;
+//   next: () => Promise<any>;
+//   previous: () => Promise<any>;
+//   togglePlayPause: () => Promise<any>;
+// } | null = null;
+
+// (async () => {
+//   try {
+//     const mod = await import('win-media-control');
+//     mediaControl = mod.default || mod;
+//     console.log('win-media-control loaded successfully');
+//   } catch (e: any) {
+//     console.warn('win-media-control load failed:', e.message);
+//     mediaControl = null;
+//   }
+// })();
+
 let mediaControl: {
   listSessions: () => Promise<any[]>;
   play: () => Promise<any>;
@@ -14,20 +58,17 @@ let mediaControl: {
   togglePlayPause: () => Promise<any>;
 } | null = null;
 
-// try {
-//   mediaControl = require('win-media-control');
-// } catch {
-//   console.warn('win-media-control not available, running in development mode');
-//   mediaControl = null;
-// }
-
-try {
-  mediaControl = require('win-media-control');
-  console.log('win-media-control loaded successfully');
-} catch (e: any) {
-  console.warn('win-media-control load failed:', e.message);
-  mediaControl = null;
-}
+(async () => {
+  try {
+    const dynamicImport = new Function('specifier', 'return import(specifier)');
+    const mod = await dynamicImport('win-media-control');
+    mediaControl = mod.default || mod;
+    console.log('win-media-control loaded successfully');
+  } catch (e: any) {
+    console.warn('win-media-control load failed:', e.message);
+    mediaControl = null;
+  }
+})();
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({

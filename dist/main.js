@@ -8,21 +8,58 @@ const path_1 = __importDefault(require("path"));
 let mainWindow = null;
 let tray = null;
 let isQuitting = false;
-let mediaControl = null;
+// let mediaControl: {
+//   listSessions: () => Promise<any[]>;
+//   play: () => Promise<any>;
+//   pause: () => Promise<any>;
+//   next: () => Promise<any>;
+//   previous: () => Promise<any>;
+//   togglePlayPause: () => Promise<any>;
+// } | null = null;
+// // try {
+// //   mediaControl = require('win-media-control');
+// // } catch {
+// //   console.warn('win-media-control not available, running in development mode');
+// //   mediaControl = null;
+// // }
 // try {
 //   mediaControl = require('win-media-control');
-// } catch {
-//   console.warn('win-media-control not available, running in development mode');
+//   console.log('win-media-control loaded successfully');
+// } catch (e: any) {
+//   console.warn('win-media-control load failed:', e.message);
 //   mediaControl = null;
 // }
-try {
-    mediaControl = require('win-media-control');
-    console.log('win-media-control loaded successfully');
-}
-catch (e) {
-    console.warn('win-media-control load failed:', e.message);
-    mediaControl = null;
-}
+// let mediaControl: {
+//   listSessions: () => Promise<any[]>;
+//   play: () => Promise<any>;
+//   pause: () => Promise<any>;
+//   next: () => Promise<any>;
+//   previous: () => Promise<any>;
+//   togglePlayPause: () => Promise<any>;
+// } | null = null;
+// (async () => {
+//   try {
+//     const mod = await import('win-media-control');
+//     mediaControl = mod.default || mod;
+//     console.log('win-media-control loaded successfully');
+//   } catch (e: any) {
+//     console.warn('win-media-control load failed:', e.message);
+//     mediaControl = null;
+//   }
+// })();
+let mediaControl = null;
+(async () => {
+    try {
+        const dynamicImport = new Function('specifier', 'return import(specifier)');
+        const mod = await dynamicImport('win-media-control');
+        mediaControl = mod.default || mod;
+        console.log('win-media-control loaded successfully');
+    }
+    catch (e) {
+        console.warn('win-media-control load failed:', e.message);
+        mediaControl = null;
+    }
+})();
 const createWindow = () => {
     mainWindow = new electron_1.BrowserWindow({
         width: 800,
