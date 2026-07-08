@@ -58,6 +58,18 @@ let mediaControl: {
   togglePlayPause: () => Promise<any>;
 } | null = null;
 
+// (async () => {
+//   try {
+//     const dynamicImport = new Function('specifier', 'return import(specifier)');
+//     const mod = await dynamicImport('win-media-control');
+//     mediaControl = mod.default || mod;
+//     console.log('win-media-control loaded successfully');
+//   } catch (e: any) {
+//     console.warn('win-media-control load failed:', e.message);
+//     mediaControl = null;
+//   }
+// })();
+
 (async () => {
   try {
     const dynamicImport = new Function('specifier', 'return import(specifier)');
