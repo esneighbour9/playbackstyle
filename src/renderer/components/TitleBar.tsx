@@ -1,31 +1,12 @@
-import { useState } from 'react';
-
 interface TitleBarProps {
   title?: string;
 }
 
 export const TitleBar = ({ title = 'Playbacker' }: TitleBarProps) => {
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('.title-bar-button')) return;
-    setIsDragging(true);
-    window.electronAPI?.startDrag?.();
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
   return (
-    <div
-      className={`title-bar ${isDragging ? 'dragging' : ''}`}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
+    <div className="title-bar">
       <div className="title-bar-title">{title}</div>
-      <div className="title-bar-controls">
+      <div className="title-bar-controls no-drag">
         <button className="title-bar-button" onClick={() => window.electronAPI.minimize()}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
             <path d="M1 5H9" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />

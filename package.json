@@ -12,7 +12,8 @@
     "build:main": "tsc -p tsconfig.main.json",
     "build:renderer": "vite build",
     "start": "electron .",
-    "build:win": "npm run build && electron-builder --win nsis"
+    "build:win": "npm run build && electron-builder --win nsis",
+    "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "appId": "com.playbacker.desktop",
@@ -27,6 +28,9 @@
       "package.json"
     ],
     "asar": true,
+    "asarUnpack": [
+      "node_modules/win-media-control/**/*"
+    ],
     "win": {
       "executableName": "Playbacker",
       "icon": "build/icon.ico",
@@ -53,11 +57,9 @@
     }
   },
   "dependencies": {
+    "win-media-control": "^0.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
-  },
-  "optionalDependencies": {
-    "win-media-control": "^0.1.1"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

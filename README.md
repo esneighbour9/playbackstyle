@@ -94,6 +94,18 @@ npm run build:win
 
 安装程序将输出到 `release/` 目录。
 
+### 安装版排障（读取不到正在播放歌曲）
+
+1. 完全退出托盘中的 Playbacker（右键托盘图标 -> 退出）
+2. 在任务管理器中确认不存在 `Playbacker.exe` 进程
+3. 重新启动安装版应用后再测试歌曲读取
+4. 如果仍失败，请检查主进程日志中是否出现 `win-media-control load failed`
+5. 确认依赖已安装并重新打包：
+   ```bash
+   npm install
+   npm run build:win
+   ```
+
 ## 构建资源
 
 `build/` 目录包含 electron-builder 打包所需的资源文件。

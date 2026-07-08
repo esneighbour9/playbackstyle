@@ -4,83 +4,43 @@ import path from 'path';
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isQuitting = false;
+const gotTheLock = app.requestSingleInstanceLock();
 
-// let mediaControl: {
-//   listSessions: () => Promise<any[]>;
-//   play: () => Promise<any>;
-//   pause: () => Promise<any>;
-//   next: () => Promise<any>;
-//   previous: () => Promise<any>;
-//   togglePlayPause: () => Promise<any>;
-// } | null = null;
-
-// // try {
-// //   mediaControl = require('win-media-control');
-// // } catch {
-// //   console.warn('win-media-control not available, running in development mode');
-// //   mediaControl = null;
-// // }
-
-// try {
-//   mediaControl = require('win-media-control');
-//   console.log('win-media-control loaded successfully');
-// } catch (e: any) {
-//   console.warn('win-media-control load failed:', e.message);
-//   mediaControl = null;
-// }
-
-// let mediaControl: {
-//   listSessions: () => Promise<any[]>;
-//   play: () => Promise<any>;
-//   pause: () => Promise<any>;
-//   next: () => Promise<any>;
-//   previous: () => Promise<any>;
-//   togglePlayPause: () => Promise<any>;
-// } | null = null;
-
-// (async () => {
-//   try {
-//     const mod = await import('win-media-control');
-//     mediaControl = mod.default || mod;
-//     console.log('win-media-control loaded successfully');
-//   } catch (e: any) {
-//     console.warn('win-media-control load failed:', e.message);
-//     mediaControl = null;
-//   }
-// })();
-
-let mediaControl: {
+type MediaControl = {
   listSessions: () => Promise<any[]>;
   play: () => Promise<any>;
   pause: () => Promise<any>;
   next: () => Promise<any>;
   previous: () => Promise<any>;
   togglePlayPause: () => Promise<any>;
-} | null = null;
+};
 
-// (async () => {
-//   try {
-//     const dynamicImport = new Function('specifier', 'return import(specifier)');
-//     const mod = await dynamicImport('win-media-control');
-//     mediaControl = mod.default || mod;
-//     console.log('win-media-control loaded successfully');
-//   } catch (e: any) {
-//     console.warn('win-media-control load failed:', e.message);
-//     mediaControl = null;
-//   }
-// })();
+let mediaControl: MediaControl | null = null;
 
-(async () => {
-  try {
-    const dynamicImport = new Function('specifier', 'return import(specifier)');
-    const mod = await dynamicImport('win-media-control');
-    mediaControl = mod.default || mod;
-    console.log('win-media-control loaded successfully');
-  } catch (e: any) {
-    console.warn('win-media-control load failed:', e.message);
-    mediaControl = null;
+const getErrorMessage = (error: unknown) => (
+  error instanceof Error ? error.message : String(error)
+);
+
+const getMediaControl = () => {
+  if (!mediaControl) {
+    throw new Error('win-media-control is not available');
   }
-})();
+  return mediaControl;
+};
+
+const loadMediaControl = async () => {
+  try {
+    const dynamicImport = new Function('specifier', 'return import(specifier)') as (
+      specifier: string
+    ) => Promise<{ default?: MediaControl } & Partial<MediaControl>>;
+    const mod = await dynamicImport('win-media-control');
+    mediaControl = mod.default || (mod as MediaControl);
+    console.log('win-media-control loaded successfully');
+  } catch (error) {
+    mediaControl = null;
+    console.error('win-media-control load failed:', getErrorMessage(error));
+  }
+};
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
@@ -114,6 +74,10 @@ const createWindow = () => {
 };
 
 const createTray = () => {
+  if (tray) {
+    return;
+  }
+
   tray = new Tray(path.join(__dirname, '../build/icon.ico'));
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -153,54 +117,60 @@ const createTray = () => {
 
 ipcMain.handle('get-media-sessions', async () => {
   try {
-    return await mediaControl?.listSessions() || [];
-  } catch {
-    return [];
+    return await getMediaControl().listSessions();
+  } catch (error) {
+    console.error('get-media-sessions failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
 ipcMain.handle('media-play', async () => {
   try {
-    await mediaControl?.play();
+    await getMediaControl().play();
     return { success: true };
-  } catch {
-    return { success: false };
+  } catch (error) {
+    console.error('media-play failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
 ipcMain.handle('media-pause', async () => {
   try {
-    await mediaControl?.pause();
+    await getMediaControl().pause();
     return { success: true };
-  } catch {
-    return { success: false };
+  } catch (error) {
+    console.error('media-pause failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
 ipcMain.handle('media-toggle', async () => {
   try {
-    await mediaControl?.togglePlayPause();
+    await getMediaControl().togglePlayPause();
     return { success: true };
-  } catch {
-    return { success: false };
+  } catch (error) {
+    console.error('media-toggle failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
 ipcMain.handle('media-next', async () => {
   try {
-    await mediaControl?.next();
+    await getMediaControl().next();
     return { success: true };
-  } catch {
-    return { success: false };
+  } catch (error) {
+    console.error('media-next failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
 ipcMain.handle('media-previous', async () => {
   try {
-    await mediaControl?.previous();
+    await getMediaControl().previous();
     return { success: true };
-  } catch {
-    return { success: false };
+  } catch (error) {
+    console.error('media-previous failed:', getErrorMessage(error));
+    throw error;
   }
 });
 
@@ -214,31 +184,55 @@ ipcMain.on('maximize', () => {
 });
 ipcMain.on('close', () => mainWindow?.close());
 
-app.whenReady().then(() => {
-  createWindow();
-  createTray();
-
-  globalShortcut.register('MediaPlayPause', () => {
-    mediaControl?.togglePlayPause();
-  });
-
-  globalShortcut.register('MediaNextTrack', () => {
-    mediaControl?.next();
-  });
-
-  globalShortcut.register('MediaPreviousTrack', () => {
-    mediaControl?.previous();
-  });
-});
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+      mainWindow.show();
+      mainWindow.focus();
+      return;
+    }
     createWindow();
-  }
-});
+  });
+
+  app.whenReady().then(async () => {
+    await loadMediaControl();
+    createWindow();
+    createTray();
+
+    globalShortcut.register('MediaPlayPause', () => {
+      void mediaControl?.togglePlayPause();
+    });
+
+    globalShortcut.register('MediaNextTrack', () => {
+      void mediaControl?.next();
+    });
+
+    globalShortcut.register('MediaPreviousTrack', () => {
+      void mediaControl?.previous();
+    });
+  });
+
+  app.on('before-quit', () => {
+    isQuitting = true;
+    globalShortcut.unregisterAll();
+    tray?.destroy();
+    tray = null;
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+}

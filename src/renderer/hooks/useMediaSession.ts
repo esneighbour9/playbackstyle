@@ -15,6 +15,7 @@ export interface PlaybackState {
   currentApp: string;
   isIdle: boolean;
   sessions: MediaSession[];
+  lastError: string | null;
 }
 
 const DEFAULT_STATE: PlaybackState = {
@@ -24,6 +25,7 @@ const DEFAULT_STATE: PlaybackState = {
   currentApp: '',
   isIdle: true,
   sessions: [],
+  lastError: null,
 };
 
 export const useMediaSession = () => {
@@ -33,28 +35,36 @@ export const useMediaSession = () => {
     try {
       const sessions = await window.electronAPI.getMediaSessions();
       const validSessions = sessions.filter(
-        (s: MediaSession) => s.title && s.artist
+        (s: MediaSession) => Boolean(s.title)
       );
       
       const appleMusicSession = validSessions.find(
         (s: MediaSession) => 
-          s.appName.toLowerCase().includes('apple') || 
-          s.appName.toLowerCase().includes('music')
+          (s.appName || '').toLowerCase().includes('apple') || 
+          (s.appName || '').toLowerCase().includes('music') ||
+          (s.appId || '').toLowerCase().includes('apple') ||
+          (s.appId || '').toLowerCase().includes('music')
       );
       
       const activeSession = appleMusicSession || validSessions[0];
       
       setState((prev) => ({
         ...prev,
+        lastError: null,
         sessions: validSessions,
         isIdle: validSessions.length === 0,
         isPlaying: activeSession?.playbackStatus === 'Playing' || false,
         currentTrack: activeSession?.title || '',
         currentArtist: activeSession?.artist || '',
-        currentApp: activeSession?.appName || '',
+        currentApp: activeSession?.appName || activeSession?.appId || '',
       }));
-    } catch {
-      setState((prev) => ({ ...prev, isIdle: true }));
+    } catch (error) {
+      console.error('Failed to fetch media sessions:', error);
+      setState((prev) => ({
+        ...prev,
+        isIdle: true,
+        lastError: '读取媒体会话失败',
+      }));
     }
   }, []);
 
