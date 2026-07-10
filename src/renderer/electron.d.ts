@@ -1,9 +1,4 @@
-﻿export interface WindowState {
-  isMaximized: boolean;
-  isFullScreen: boolean;
-}
-
-export interface ElectronAPI {
+﻿export interface ElectronAPI {
   getMediaSessions: () => Promise<any[]>;
   mediaPlay: () => Promise<any>;
   mediaPause: () => Promise<any>;
@@ -13,8 +8,6 @@ export interface ElectronAPI {
   minimize: () => void;
   maximize: () => void;
   close: () => void;
-  getWindowState: () => Promise<WindowState>;
-  onWindowStateChanged: (callback: (state: WindowState) => void) => () => void;
 }
 
 declare global {

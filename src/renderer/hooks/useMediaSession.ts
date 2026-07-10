@@ -107,5 +107,10 @@ export const useMediaSession = () => {
     next,
     previous,
     refresh: fetchSessions,
+    playbackStatus: (state.isIdle
+      ? 'Stopped'
+      : state.isPlaying
+        ? 'Playing'
+        : 'Paused') as 'Playing' | 'Paused' | 'Stopped',
   };
 };

@@ -17,15 +17,6 @@ type MediaControl = {
 
 let mediaControl: MediaControl | null = null;
 
-const sendWindowState = () => {
-  if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send('window-state-changed', {
-      isMaximized: mainWindow.isMaximized(),
-      isFullScreen: mainWindow.isFullScreen(),
-    });
-  }
-};
-
 const getErrorMessage = (error: unknown) => (
   error instanceof Error ? error.message : String(error)
 );
@@ -73,12 +64,6 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   }
-
-  mainWindow.on('resize', sendWindowState);
-  mainWindow.on('maximize', sendWindowState);
-  mainWindow.on('unmaximize', sendWindowState);
-  mainWindow.on('enter-full-screen', sendWindowState);
-  mainWindow.on('leave-full-screen', sendWindowState);
 
   mainWindow.on('close', (e) => {
     if (!isQuitting) {
@@ -198,11 +183,6 @@ ipcMain.on('maximize', () => {
   }
 });
 ipcMain.on('close', () => mainWindow?.close());
-
-ipcMain.handle('get-window-state', () => {
-  if (!mainWindow || mainWindow.isDestroyed()) return { isMaximized: false, isFullScreen: false };
-  return { isMaximized: mainWindow.isMaximized(), isFullScreen: mainWindow.isFullScreen() };
-});
 
 if (!gotTheLock) {
   app.quit();

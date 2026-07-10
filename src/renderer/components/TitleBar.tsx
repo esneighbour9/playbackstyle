@@ -1,11 +1,15 @@
 interface TitleBarProps {
   title?: string;
+  playbackStatus?: 'Playing' | 'Paused' | 'Stopped';
 }
 
-export const TitleBar = ({ title = 'Playbacker' }: TitleBarProps) => {
+export const TitleBar = ({ title = 'Playbacker', playbackStatus = 'Stopped' }: TitleBarProps) => {
   return (
     <div className="title-bar">
-      <div className="title-bar-title">{title}</div>
+      <div className="title-bar-left">
+        <span className={`status-dot ${playbackStatus.toLowerCase()}`} />
+        <div className="title-bar-title">{title}</div>
+      </div>
       <div className="title-bar-controls no-drag">
         <button className="title-bar-button" onClick={() => window.electronAPI.minimize()}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">

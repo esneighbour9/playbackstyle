@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { TitleBar } from './components/TitleBar';
 import { AlbumArt } from './components/AlbumArt';
 import { TrackInfo } from './components/TrackInfo';
@@ -7,6 +7,7 @@ import { LyricsDisplay } from './components/LyricsDisplay';
 import { IdleState } from './components/IdleState';
 import { useMediaSession } from './hooks/useMediaSession';
 import { useLyrics } from './hooks/useLyrics';
+import { computeHue } from './utils/hashColor';
 
 function App() {
   const {
@@ -15,6 +16,7 @@ function App() {
     currentArtist,
     currentApp,
     isIdle,
+    playbackStatus,
     toggle,
     next,
     previous,
@@ -23,18 +25,7 @@ function App() {
   const { lyrics, currentLineIndex, searchLyrics, updateCurrentLine } = useLyrics();
   const prevTrackRef = useRef('');
   const prevArtistRef = useRef('');
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  useEffect(() => {
-    window.electronAPI.getWindowState().then((state) => {
-      setIsExpanded(state.isMaximized || state.isFullScreen);
-    });
-
-    const cleanup = window.electronAPI.onWindowStateChanged((state) => {
-      setIsExpanded(state.isMaximized || state.isFullScreen);
-    });
-    return () => cleanup();
-  }, []);
+  const accentHue = computeHue(currentTrack, currentArtist);
 
   useEffect(() => {
     if (currentTrack !== prevTrackRef.current || currentArtist !== prevArtistRef.current) {
@@ -56,34 +47,41 @@ function App() {
   }, [isPlaying, updateCurrentLine]);
 
   return (
-    <div className="app-container">
+    <div
+      className="app-container"
+      style={{
+        '--accent-hue': accentHue,
+        '--accent-hue-2': (accentHue + 60) % 360,
+        '--accent-hue-3': (accentHue + 180) % 360,
+      } as React.CSSProperties}
+    >
       <div className="app-glass">
         <div className="app-content">
-          <TitleBar />
+          <TitleBar playbackStatus={playbackStatus} />
           
           {isIdle ? (
             <IdleState />
           ) : (
-            <div className={'player-content' + (isExpanded ? ' expanded' : '')}>
+            <div className="player-content">
               <div className="player-main">
-                <AlbumArt title={currentTrack} artist={currentArtist} isPlaying={isPlaying} />
+                <AlbumArt isPlaying={isPlaying} accentHue={accentHue} />
                 <TrackInfo title={currentTrack} artist={currentArtist} appName={currentApp} />
               </div>
-              
+
               <PlaybackControls
                 isPlaying={isPlaying}
-                onPlay={() => {}}
-                onPause={() => {}}
+                accentHue={accentHue}
                 onToggle={toggle}
                 onNext={next}
                 onPrevious={previous}
                 disabled={isIdle}
               />
-              
+
               <LyricsDisplay
                 lyrics={lyrics}
                 currentLineIndex={currentLineIndex}
                 isPlaying={isPlaying}
+                accentHue={accentHue}
               />
             </div>
           )}

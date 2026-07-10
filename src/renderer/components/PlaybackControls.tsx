@@ -1,7 +1,6 @@
 interface PlaybackControlsProps {
   isPlaying: boolean;
-  onPlay: () => void;
-  onPause: () => void;
+  accentHue: number;
   onToggle: () => void;
   onNext: () => void;
   onPrevious: () => void;
@@ -10,13 +9,17 @@ interface PlaybackControlsProps {
 
 export const PlaybackControls = ({
   isPlaying,
+  accentHue,
   onToggle,
   onNext,
   onPrevious,
   disabled = false,
 }: PlaybackControlsProps) => {
   return (
-    <div className="playback-controls">
+    <div
+      className="playback-controls"
+      style={{ '--accent-hue': accentHue } as React.CSSProperties}
+    >
       <button
         className="control-button"
         onClick={onPrevious}
