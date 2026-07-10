@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { TitleBar } from './components/TitleBar';
 import { AlbumArt } from './components/AlbumArt';
 import { TrackInfo } from './components/TrackInfo';
@@ -23,6 +23,18 @@ function App() {
   const { lyrics, currentLineIndex, searchLyrics, updateCurrentLine } = useLyrics();
   const prevTrackRef = useRef('');
   const prevArtistRef = useRef('');
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    window.electronAPI.getWindowState().then((state) => {
+      setIsExpanded(state.isMaximized || state.isFullScreen);
+    });
+
+    const cleanup = window.electronAPI.onWindowStateChanged((state) => {
+      setIsExpanded(state.isMaximized || state.isFullScreen);
+    });
+    return () => cleanup();
+  }, []);
 
   useEffect(() => {
     if (currentTrack !== prevTrackRef.current || currentArtist !== prevArtistRef.current) {
@@ -52,7 +64,7 @@ function App() {
           {isIdle ? (
             <IdleState />
           ) : (
-            <div className="player-content">
+            <div className={'player-content' + (isExpanded ? ' expanded' : '')}>
               <div className="player-main">
                 <AlbumArt title={currentTrack} artist={currentArtist} isPlaying={isPlaying} />
                 <TrackInfo title={currentTrack} artist={currentArtist} appName={currentApp} />

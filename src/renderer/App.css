@@ -1,4 +1,4 @@
-.app-container {
+﻿.app-container {
   width: 100%;
   height: 100%;
   position: relative;
@@ -100,6 +100,7 @@
   color: white;
 }
 
+/* ===== Normal mode (default) ===== */
 .player-content {
   flex: 1;
   display: flex;
@@ -108,6 +109,7 @@
   justify-content: center;
   padding: 32px;
   gap: 32px;
+  transition: all 0.35s ease;
 }
 
 .player-main {
@@ -130,7 +132,7 @@
   justify-content: center;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: width 0.35s ease, height 0.35s ease, transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
@@ -189,6 +191,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: font-size 0.35s ease;
 }
 
 .track-artist {
@@ -198,6 +201,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: font-size 0.35s ease;
 }
 
 .track-source {
@@ -217,6 +221,7 @@
   border-radius: 40px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.35s ease;
 }
 
 .control-button {
@@ -269,6 +274,7 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.35s ease;
 }
 
 .lyrics-display.empty {
@@ -380,6 +386,110 @@
   }
 }
 
+/* ===== Expanded / Fullscreen mode ===== */
+.player-content.expanded {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) 1fr;
+  grid-template-rows: 1fr;
+  gap: 24px 48px;
+  padding: 32px 48px;
+  align-items: center;
+  justify-items: center;
+}
+
+.player-content.expanded .player-main {
+  grid-column: 1;
+  grid-row: 1;
+  gap: 24px;
+  max-width: 380px;
+}
+
+.player-content.expanded .playback-controls {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  gap: 24px;
+}
+
+.player-content.expanded .lyrics-display {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
+  max-height: none;
+  max-width: 520px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 16px 24px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.player-content.expanded .lyrics-display.empty {
+  justify-content: center;
+}
+
+.player-content.expanded .lyric-line {
+  padding: 14px 20px;
+  font-size: 16px;
+  opacity: 0.45;
+  line-height: 1.6;
+}
+
+.player-content.expanded .lyric-line.active {
+  font-size: 22px;
+  font-weight: 600;
+  opacity: 1;
+  transform: scale(1.03);
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.25);
+  padding: 16px 20px;
+}
+
+.player-content.expanded .album-art {
+  width: 300px;
+  height: 300px;
+  border-radius: 20px;
+}
+
+.player-content.expanded .album-art:hover {
+  transform: scale(1.03);
+}
+
+.player-content.expanded .album-art.playing {
+  animation: expanded-pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes expanded-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6), 0 0 60px rgba(255, 255, 255, 0.12);
+  }
+}
+
+.player-content.expanded .track-title {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.player-content.expanded .track-artist {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.player-content.expanded .track-source {
+  font-size: 12px;
+}
+
+.player-content.expanded .track-info {
+  max-width: 360px;
+}
+
 @media (max-width: 700px) {
   .player-content {
     padding: 20px;
@@ -412,5 +522,41 @@
   .control-button.play {
     width: 50px;
     height: 50px;
+  }
+
+  .player-content.expanded {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    padding: 20px;
+    gap: 16px;
+    overflow-y: auto;
+  }
+
+  .player-content.expanded .player-main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .player-content.expanded .playback-controls {
+    position: static;
+    grid-column: 1;
+    grid-row: 2;
+    transform: none;
+  }
+
+  .player-content.expanded .lyrics-display {
+    grid-column: 1;
+    grid-row: 3;
+    height: 200px;
+    max-width: 100%;
+  }
+
+  .player-content.expanded .album-art {
+    width: 220px;
+    height: 220px;
+  }
+
+  .player-content.expanded .lyric-line.active {
+    font-size: 18px;
   }
 }
