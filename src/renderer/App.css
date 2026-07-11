@@ -203,16 +203,16 @@
 }
 
 .album-art:hover {
-  transform: scale(1.02);
+  /* hover feedback handled by 3D tilt; no transform needed */
 }
 
 /* Wrapper layer — carries breathing scale so it doesn't conflict with hover/tilt on .album-art */
 .album-art-wrapper {
-  display: contents;
+  display: block;
 }
 
 .album-art-wrapper.playing {
-  display: contents;
+  display: block;
   animation: breathe-scale 3s ease-in-out infinite;
 }
 
@@ -641,7 +641,7 @@
   }
 
   .album-art:hover {
-    transform: scale(1.03);
+    /* hover feedback handled by 3D tilt */
   }
 
   .album-art.playing {

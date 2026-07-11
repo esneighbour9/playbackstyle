@@ -43,6 +43,7 @@ export const ParticleBackground = ({ accentHue, isPlaying, dense = false }: Part
   const frameRef = useRef(0);
   const accentRef = useRef(accentHue);
   accentRef.current = accentHue;
+  const dprRef = useRef(1);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -51,14 +52,18 @@ export const ParticleBackground = ({ accentHue, isPlaying, dense = false }: Part
     if (!ctx) return;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      dprRef.current = dpr;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
       // Re-initialize particles on resize with new bounds
       particlesRef.current = createParticles(
         dense ? DENSE_COUNT : BASE_COUNT,
         accentRef.current,
-        canvas.width,
-        canvas.height,
+        canvas.width / dpr,
+        canvas.height / dpr,
       );
     };
 
@@ -71,8 +76,13 @@ export const ParticleBackground = ({ accentHue, isPlaying, dense = false }: Part
       const particles = particlesRef.current;
       if (particles.length === 0) return;
       const speed = isPlaying ? PLAYING_SPEED : BASE_SPEED;
-      const w = canvas.width;
-      const h = canvas.height;
+      const dpr = dprRef.current;
+      const w = canvas.width / dpr;
+      const h = canvas.height / dpr;
+
+      // Clear previous frame
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
 
       // Update positions
       for (let i = 0; i < particles.length; i++) {
@@ -145,6 +155,7 @@ export const ParticleBackground = ({ accentHue, isPlaying, dense = false }: Part
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${p.hue}, 60%, 55%, ${p.opacity})`;
         ctx.shadowColor = `hsla(${p.hue}, 70%, 50%, ${p.opacity * 0.6})`;
         ctx.shadowBlur = p.radius * 3;

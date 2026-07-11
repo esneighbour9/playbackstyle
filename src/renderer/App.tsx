@@ -28,23 +28,29 @@ function App() {
   const prevTrackRef = useRef('');
   const prevArtistRef = useRef('');
   const accentHue = computeHue(currentTrack, currentArtist);
+  const elapsedRef = useRef(0);
+  const startTimeRef = useRef(0);
 
   useEffect(() => {
     if (currentTrack !== prevTrackRef.current || currentArtist !== prevArtistRef.current) {
       prevTrackRef.current = currentTrack;
       prevArtistRef.current = currentArtist;
+      elapsedRef.current = 0;
       searchLyrics(currentTrack, currentArtist);
     }
   }, [currentTrack, currentArtist, searchLyrics]);
 
   useEffect(() => {
     if (isPlaying) {
-      let startTime = Date.now();
+      startTimeRef.current = Date.now();
       const interval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
+        const elapsed = elapsedRef.current + (Date.now() - startTimeRef.current) / 1000;
         updateCurrentLine(elapsed);
       }, 100);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        elapsedRef.current += (Date.now() - startTimeRef.current) / 1000;
+      };
     }
   }, [isPlaying, updateCurrentLine]);
 

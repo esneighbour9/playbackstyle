@@ -40,8 +40,7 @@ export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           style={{
-            transform: `perspective(600px) rotateX(${tilt.ry}deg) rotateY(${tilt.rx}deg)`,
-            transition: 'transform 0.3s ease-out',
+            transform: `rotateX(${tilt.ry}deg) rotateY(${tilt.rx}deg)`,
           }}
         >
         {/* Layer 1: radial glow behind art */}

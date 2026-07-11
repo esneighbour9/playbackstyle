@@ -1,5 +1,7 @@
-﻿export interface ElectronAPI {
-  getMediaSessions: () => Promise<any[]>;
+﻿import type { MediaSession } from '../shared/types';
+
+export interface ElectronAPI {
+  getMediaSessions: () => Promise<MediaSession[]>;
   mediaPlay: () => Promise<any>;
   mediaPause: () => Promise<any>;
   mediaToggle: () => Promise<any>;

@@ -11,12 +11,3 @@ contextBridge.exposeInMainWorld('electronAPI', {
   maximize: () => ipcRenderer.send('maximize'),
   close: () => ipcRenderer.send('close'),
 });
-
-// Sync with src/shared/types.ts — canonical source of truth
-export type MediaSession = {
-  appName: string;
-  appId: string;
-  title: string;
-  artist: string;
-  playbackStatus: 'Playing' | 'Paused' | 'Stopped';
-};
