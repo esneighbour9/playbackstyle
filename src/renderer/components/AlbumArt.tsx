@@ -34,15 +34,16 @@ export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
 
   return (
     <div className="album-art-container">
-      <div
-        className={`album-art ${isPlaying ? 'playing' : ''}`}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          transform: `perspective(600px) rotateX(${tilt.ry}deg) rotateY(${tilt.rx}deg)`,
-          transition: isPlaying ? 'transform 0.3s ease-out, box-shadow 0.3s ease' : 'transform 0.5s ease, box-shadow 0.3s ease',
-        }}
-      >
+      <div className={`album-art-wrapper ${isPlaying ? 'playing' : ''}`}>
+        <div
+          className="album-art"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            transform: `perspective(600px) rotateX(${tilt.ry}deg) rotateY(${tilt.rx}deg)`,
+            transition: 'transform 0.3s ease-out',
+          }}
+        >
         {/* Layer 1: radial glow behind art */}
         <div
           className="album-art-glow-layer"
@@ -110,6 +111,7 @@ export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
             <circle cx="6" cy="18" r="3" />
             <circle cx="18" cy="16" r="3" />
           </svg>
+        </div>
         </div>
       </div>
     </div>

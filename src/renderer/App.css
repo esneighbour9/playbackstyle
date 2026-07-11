@@ -206,7 +206,13 @@
   transform: scale(1.02);
 }
 
-.album-art.playing {
+/* Wrapper layer — carries breathing scale so it doesn't conflict with hover/tilt on .album-art */
+.album-art-wrapper {
+  display: contents;
+}
+
+.album-art-wrapper.playing {
+  display: contents;
   animation: breathe-scale 3s ease-in-out infinite;
 }
 
