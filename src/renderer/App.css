@@ -197,8 +197,9 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  transition: width 0.35s ease, height 0.35s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition: width 0.35s ease, height 0.35s ease, transform 0.3s ease-out, box-shadow 0.3s ease;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform-style: preserve-3d;
 }
 
 .album-art:hover {
@@ -206,7 +207,26 @@
 }
 
 .album-art.playing {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: breathe-scale 3s ease-in-out infinite;
+}
+
+/* Layer 5: light sweep */
+.album-art-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  animation: light-sweep 8s linear infinite;
+}
+
+@keyframes light-sweep {
+  0%   { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(200%) translateY(200%); }
+}
+
+@keyframes breathe-scale {
+  0%, 100% { transform: scale(0.97); }
+  50%      { transform: scale(1.03); }
 }
 
 /* Layer 1: radial glow behind art */
@@ -455,14 +475,65 @@
   z-index: 1;
 }
 
+/* Ring glow container — relative anchor for children */
+.idle-ring-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 24px;
+}
+
+/* Hollow rotating ring */
+.idle-ring {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  animation: ring-rotate 12s linear infinite, ring-breathe 3s ease-in-out infinite;
+}
+
+@keyframes ring-rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ring-breathe {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.05); }
+  50%      { box-shadow: 0 0 30px rgba(255, 255, 255, 0.12), 0 0 60px rgba(255, 255, 255, 0.04); }
+}
+
+/* Orbiting glow particles around the ring */
+.idle-ring-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  animation: orbit 5s linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(var(--angle)) translateX(65px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(var(--angle)) translateX(65px) rotate(360deg);
+  }
+}
+
 .idle-icon {
   width: 120px;
   height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
-  color: rgba(255, 255, 255, 0.2);
+  margin: -144px auto 24px; /* pull up into ring center */
+  color: rgba(255, 255, 255, 0.25);
   animation: float 6s ease-in-out infinite;
 }
 
@@ -492,33 +563,6 @@
 .idle-hint {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.3);
-}
-
-.idle-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  animation: particle-float 5s ease-in-out infinite;
-}
-
-@keyframes particle-float {
-  0%, 100% {
-    opacity: 0;
-    transform: translateY(0) scale(0);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateY(-50px) scale(1);
-  }
 }
 
 /* ===== Two-column layout (≥ 720px) ===== */

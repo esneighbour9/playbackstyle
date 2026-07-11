@@ -7,6 +7,19 @@ interface AlbumArtProps {
 
 export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
   const [barHeights, setBarHeights] = useState([0.3, 0.6, 0.8, 0.5, 0.7, 0.4]);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    setTilt({
+      rx: (e.clientX - cx) / (rect.width / 2) * 5,
+      ry: (e.clientY - cy) / (rect.height / 2) * -5,
+    });
+  };
+
+  const handleMouseLeave = () => setTilt({ rx: 0, ry: 0 });
 
   useEffect(() => {
     if (!isPlaying) {
@@ -21,7 +34,15 @@ export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
 
   return (
     <div className="album-art-container">
-      <div className={`album-art ${isPlaying ? 'playing' : ''}`}>
+      <div
+        className={`album-art ${isPlaying ? 'playing' : ''}`}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: `perspective(600px) rotateX(${tilt.ry}deg) rotateY(${tilt.rx}deg)`,
+          transition: isPlaying ? 'transform 0.3s ease-out, box-shadow 0.3s ease' : 'transform 0.5s ease, box-shadow 0.3s ease',
+        }}
+      >
         {/* Layer 1: radial glow behind art */}
         <div
           className="album-art-glow-layer"
@@ -68,6 +89,19 @@ export const AlbumArt = ({ isPlaying, accentHue }: AlbumArtProps) => {
             boxShadow: isPlaying ? `0 0 20px hsl(${accentHue}, 70%, 55%, 0.4)` : 'none',
           }}
         />
+
+        {/* Layer 5: light sweep — diagonal highlight gliding across */}
+        {isPlaying && (
+          <div
+            className="album-art-sweep"
+            style={{
+              background: `linear-gradient(105deg,
+                transparent 40%,
+                hsla(${accentHue}, 80%, 80%, 0.15) 50%,
+                transparent 60%)`,
+            }}
+          />
+        )}
 
         {/* Music note placeholder — kept subtle in center */}
         <div className="album-art-placeholder">
