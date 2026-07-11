@@ -5,6 +5,7 @@ import { TrackInfo } from './components/TrackInfo';
 import { PlaybackControls } from './components/PlaybackControls';
 import { LyricsDisplay } from './components/LyricsDisplay';
 import { IdleState } from './components/IdleState';
+import { ParticleBackground } from './components/ParticleBackground';
 import { useMediaSession } from './hooks/useMediaSession';
 import { useLyrics } from './hooks/useLyrics';
 import { computeHue } from './utils/hashColor';
@@ -16,13 +17,14 @@ function App() {
     currentArtist,
     currentApp,
     isIdle,
+    lastError,
     playbackStatus,
     toggle,
     next,
     previous,
   } = useMediaSession();
 
-  const { lyrics, currentLineIndex, searchLyrics, updateCurrentLine } = useLyrics();
+  const { lyrics, isLoading, currentLineIndex, lyricsError, searchLyrics, updateCurrentLine } = useLyrics();
   const prevTrackRef = useRef('');
   const prevArtistRef = useRef('');
   const accentHue = computeHue(currentTrack, currentArtist);
@@ -57,7 +59,7 @@ function App() {
     >
       <div className="app-glass">
         <div className="app-content">
-          <TitleBar playbackStatus={playbackStatus} />
+          <TitleBar playbackStatus={playbackStatus} error={lastError} />
           
           {isIdle ? (
             <IdleState />
@@ -81,6 +83,8 @@ function App() {
                 lyrics={lyrics}
                 currentLineIndex={currentLineIndex}
                 isPlaying={isPlaying}
+                isLoading={isLoading}
+                error={lyricsError}
                 accentHue={accentHue}
               />
             </div>
@@ -89,6 +93,7 @@ function App() {
       </div>
       
       <div className="app-background" />
+      <ParticleBackground accentHue={accentHue} isPlaying={isPlaying} dense={isIdle} />
     </div>
   );
 }

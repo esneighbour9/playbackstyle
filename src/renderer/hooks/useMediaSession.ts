@@ -1,12 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { MediaSession } from '../../shared/types';
 
-export interface MediaSession {
-  appName: string;
-  appId: string;
-  title: string;
-  artist: string;
-  playbackStatus: 'Playing' | 'Paused' | 'Stopped';
-}
+// Re-export for components that import from here
+export type { MediaSession };
 
 export interface PlaybackState {
   isPlaying: boolean;

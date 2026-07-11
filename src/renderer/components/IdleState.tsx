@@ -1,4 +1,20 @@
-﻿export const IdleState = () => {
+﻿import { useMemo } from 'react';
+
+export const IdleState = () => {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, i) => ({
+        key: i,
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${3 + Math.random() * 4}s`,
+        width: `${2 + Math.random() * 4}px`,
+        height: `${2 + Math.random() * 4}px`,
+      })),
+    [],
+  );
+
   return (
     <div className="idle-state">
       <div className="idle-content">
@@ -14,17 +30,17 @@
         <p className="idle-hint">启动 Apple Music 或其他媒体播放器以开始控制</p>
       </div>
       <div className="idle-particles">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {particles.map((p) => (
           <div
-            key={i}
+            key={p.key}
             className="particle"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-              width: `${2 + Math.random() * 4}px`,
-              height: `${2 + Math.random() * 4}px`,
+              left: p.left,
+              top: p.top,
+              animationDelay: p.animationDelay,
+              animationDuration: p.animationDuration,
+              width: p.width,
+              height: p.height,
             }}
           />
         ))}

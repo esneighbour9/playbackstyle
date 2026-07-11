@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   close: () => ipcRenderer.send('close'),
 });
 
+// Sync with src/shared/types.ts — canonical source of truth
 export type MediaSession = {
   appName: string;
   appId: string;
